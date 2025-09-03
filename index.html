@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Kalkulator Sederhana</title>
   <style>
-    body{font-family:Arial, sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;background:#f4f4f4;margin:0}
+    body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;background:#f4f4f4;margin:0}
     .calculator{background:#fff;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.2);width:300px}
     .display{width:100%;height:50px;font-size:24px;text-align:right;margin-bottom:10px;padding:6px 8px;border:1px solid #ccc;border-radius:8px}
     .buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
@@ -19,34 +19,34 @@
 
     <div class="buttons">
       <!-- row 2 -->
-      <button onclick="append('1')">1</button>
-      <button onclick="append('2')">2</button>
-      <button onclick="append('3')">3</button>
-      <button onclick="append('+')">+</button>
+      <button onclick="appendSymbol('1')">1</button>
+      <button onclick="appendSymbol('2')">2</button>
+      <button onclick="appendSymbol('3')">3</button>
+      <button onclick="appendSymbol('+')">+</button>
 
       <!-- row 3 -->
-      <button onclick="append('4')">4</button>
-      <button onclick="append('5')">5</button>
-      <button onclick="append('6')">6</button>
-      <button onclick="append('-')">-</button>
+      <button onclick="appendSymbol('4')">4</button>
+      <button onclick="appendSymbol('5')">5</button>
+      <button onclick="appendSymbol('6')">6</button>
+      <button onclick="appendSymbol('-')">-</button>
 
       <!-- row 4 -->
-      <button onclick="append('7')">7</button>
-      <button onclick="append('8')">8</button>
-      <button onclick="append('9')">9</button>
-      <button onclick="append('*','x')">x</button>
+      <button onclick="appendSymbol('7')">7</button>
+      <button onclick="appendSymbol('8')">8</button>
+      <button onclick="appendSymbol('9')">9</button>
+      <button onclick="appendSymbol('*','x')">x</button>
 
       <!-- row 5 -->
       <button onclick="clearDisplay()">C</button>
-      <button onclick="append('0')">0</button>
-      <button onclick="append('.')">.</button>
-      <button onclick="append('/',':')">:</button>
+      <button onclick="appendSymbol('0')">0</button>
+      <button onclick="appendSymbol('.')">.</button>
+      <button onclick="appendSymbol('/','÷')">:</button>
 
       <!-- row 6 -->
-      <button onclick="append('(')">(</button>
-      <button onclick="append(')')">)</button>
+      <button onclick="appendSymbol('(')">(</button>
+      <button onclick="appendSymbol(')')">)</button>
       <button onclick="calculate()">=</button>
-      <button onclick="append('**','^')">xʸ</button>
+      <button onclick="appendSymbol('**','^')">xʸ</button>
 
       <!-- row 7 -->
       <button class="span-all" onclick="convertToRoman()">ROMAWI</button>
@@ -56,73 +56,83 @@
   <script>
     let calculation = "";
     let calculationDisplay = "";
+    let isResult = false; // penanda apakah terakhir hasil
 
     const $display = () => document.getElementById("display");
-
     function setDisplay(text){ $display().value = text; }
 
-    function append(symbol, displaySymbol=null){
+    function appendSymbol(symbol, displaySymbol=null){
+      // kalau sebelumnya hasil & tombol angka → reset
+      if(isResult && !isNaN(symbol)){
+        calculation = "";
+        calculationDisplay = "";
+        isResult = false;
+      }
       calculation += symbol;
-      calculationDisplay += (displaySymbol!==null ? displaySymbol : symbol);
+      calculationDisplay += displaySymbol !== null ? displaySymbol : symbol;
       setDisplay(calculationDisplay);
+      isResult = false;
     }
 
     function clearDisplay(){
       calculation = "";
       calculationDisplay = "";
       setDisplay("");
+      isResult = false;
     }
 
-function calculate(){
-  try{
-    const result = eval(calculation);
+    function calculate(){
+      try{
+        const result = eval(calculation);
 
-    if (!Number.isFinite(result)) {
-      clearDisplay();
-      setDisplay("undefined");
-      return;
+        // bagi 0 -> undefined
+        if (!Number.isFinite(result)) {
+          clearDisplay();
+          setDisplay("undefined");
+          isResult = true;
+          return;
+        }
+
+        calculation = String(result);
+        calculationDisplay = String(result);
+        setDisplay(calculationDisplay);
+        isResult = true; 
+      }catch(e){
+        clearDisplay();
+        setDisplay("Error");
+        isResult = true;
+      }
     }
 
-    calculation = String(result);
-    calculationDisplay = String(result);
-    setDisplay(calculationDisplay);
-  }catch(e){
-    clearDisplay();
-    setDisplay("Error");
-  }
-}
+    function convertToRoman(){
+      try{
+        let n = Math.trunc(eval(calculation));
 
+        if (!Number.isFinite(n) || n < 1 || n > 3999){
+          setDisplay("Angka tidak valid");
+          isResult = true;
+          return;
+        }
 
-  function convertToRoman(){
-  try{
-    let n = Math.trunc(eval(calculation));
+        const romanPairs = [
+          [1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],
+          [100,'C'],[90,'XC'],[50,'L'],[40,'XL'],
+          [10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']
+        ];
+        let res = "";
+        for (const [val,sym] of romanPairs){
+          while (n >= val){ res += sym; n -= val; }
+        }
 
-    if (!Number.isFinite(n) || n < 1 || n > 3999){
-      setDisplay("Angka tidak valid");
-      return;
+        calculation = String(Math.trunc(eval(calculation))); 
+        calculationDisplay = res;
+        setDisplay(res);
+        isResult = true;
+      }catch(e){
+        setDisplay("Error");
+        isResult = true;
+      }
     }
-
-    const romanPairs = [
-      [1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],
-      [100,'C'],[90,'XC'],[50,'L'],[40,'XL'],
-      [10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']
-    ];
-    let res = "";
-    for (const [val,sym] of romanPairs){
-      while (n >= val){ res += sym; n -= val; }
-    }
-
-    calculation = String(Math.trunc(eval(calculation)));
-    calculationDisplay = res;
-    setDisplay(res);
-  }catch(e){
-    setDisplay("Error");
-  }
-}
-  let isResult = false;
-
-
   </script>
 </body>
 </html>
-
