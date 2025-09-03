@@ -73,47 +73,53 @@
       setDisplay("");
     }
 
-    function calculate(){
-      try{
-        if (calculation.includes("/0")){
-          clearDisplay();
-          setDisplay("undefined");
-          return;
-        }
-        const result = eval(calculation);
-        calculation = String(result);
-        calculationDisplay = String(result);
-        setDisplay(calculationDisplay);
-      }catch(e){
-        clearDisplay();
-        setDisplay("Error");
-      }
+function calculate(){
+  try{
+    const result = eval(calculation);
+
+    if (!Number.isFinite(result)) {
+      clearDisplay();
+      setDisplay("undefined");
+      return;
     }
 
-    function convertToRoman(){
-      try{
-        let n = Math.trunc(eval(calculation));
-        if (!Number.isFinite(n) || n < 1 || n > 3999){
-          setDisplay("Angka tidak valid");
-          return;
-        }
-        const romanPairs = [
-          [1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],
-          [100,'C'],[90,'XC'],[50,'L'],[40,'XL'],
-          [10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']
-        ];
-        let res = "";
-        for (const [val,sym] of romanPairs){
-          while (n >= val){ res += sym; n -= val; }
-        }
-        // tampilkan ROMAWI, tapi nilai internal tetap angka
-        calculation = String(Math.trunc(eval(calculation)));
-        calculationDisplay = res;
-        setDisplay(res);
-      }catch(e){
-        setDisplay("Error");
-      }
+    calculation = String(result);
+    calculationDisplay = String(result);
+    setDisplay(calculationDisplay);
+  }catch(e){
+    clearDisplay();
+    setDisplay("Error");
+  }
+}
+
+
+  function convertToRoman(){
+  try{
+    let n = Math.trunc(eval(calculation));
+
+    if (!Number.isFinite(n) || n < 1 || n > 3999){
+      setDisplay("Angka tidak valid");
+      return;
     }
+
+    const romanPairs = [
+      [1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],
+      [100,'C'],[90,'XC'],[50,'L'],[40,'XL'],
+      [10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']
+    ];
+    let res = "";
+    for (const [val,sym] of romanPairs){
+      while (n >= val){ res += sym; n -= val; }
+    }
+
+    calculation = String(Math.trunc(eval(calculation)));
+    calculationDisplay = res;
+    setDisplay(res);
+  }catch(e){
+    setDisplay("Error");
+  }
+}
+
   </script>
 </body>
 </html>
