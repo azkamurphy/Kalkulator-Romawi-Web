@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kalkulator Sederhana</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f4f4f4;
+    }
+    .calculator {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+      width: 300px;
+      text-align: center;
+    }
+    .display {
+      width: 100%;
+      height: 50px;
+      font-size: 24px;
+      text-align: right;
+      margin-bottom: 10px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    button {
+      font-size: 18px;
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #eee;
+    }
+    button:hover {
+      background: #ddd;
+    }
+    .wide {
+      grid-column: span 2;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <input type="text" id="display" class="display" disabled>
+    <div class="buttons">
+      <button onclick="append('1')">1</button>
+      <button onclick="append('2')">2</button>
+      <button onclick="append('3')">3</button>
+      <button onclick="append('+')">+</button>
+
+      <button onclick="append('4')">4</button>
+      <button onclick="append('5')">5</button>
+      <button onclick="append('6')">6</button>
+      <button onclick="append('-')">-</button>
+
+      <button onclick="append('7')">7</button>
+      <button onclick="append('8')">8</button>
+      <button onclick="append('9')">9</button>
+      <button onclick="append('*')">x</button>
+
+      <button onclick="append('0')">0</button>
+      <button onclick="append('.')">.</button>
+      <button onclick="append('/')">÷</button>
+      <button onclick="append('**')">xʸ</button>
+
+      <button onclick="append('(')">(</button>
+      <button onclick="append(')')">)</button>
+      <button onclick="clearDisplay()">C</button>
+      <button onclick="calculate()">=</button>
+
+      <button class="wide" onclick="convertToRoman()">ROMAWI</button>
+    </div>
+  </div>
+
+  <script>
+    let calculation = "";
+
+    function append(symbol) {
+      calculation += symbol;
+      document.getElementById("display").value = calculation;
+    }
+
+    function clearDisplay() {
+      calculation = "";
+      document.getElementById("display").value = "";
+    }
+
+    function calculate() {
+      try {
+        if (calculation.includes("/0")) {
+          clearDisplay();
+          document.getElementById("display").value = "undefined";
+          return;
+        }
+        let result = eval(calculation);
+        calculation = result.toString();
+        document.getElementById("display").value = result;
+      } catch {
+        document.getElementById("display").value = "Error";
+      }
+    }
+
+    function convertToRoman() {
+      try {
+        let num = eval(calculation);
+        num = Math.floor(num);
+        if (num < 1 || num > 3999) {
+          document.getElementById("display").value = "Angka tidak valid";
+          return;
+        }
+        const romanMap = {
+          1000: "M", 900: "CM", 500: "D", 400: "CD", 100: "C",
+          90: "XC", 50: "L", 40: "XL", 10: "X", 9: "IX",
+          5: "V", 4: "IV", 1: "I"
+        };
+        let result = "";
+        for (let key in romanMap) {
+          while (num >= key) {
+            result += romanMap[key];
+            num -= key;
+          }
+        }
+        document.getElementById("display").value = result;
+        calculation = result;
+      } catch {
+        document.getElementById("display").value = "Error";
+      }
+    }
+  </script>
+</body>
+</html>
